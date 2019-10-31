@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import Axios from 'axios';
+import { Formik } from 'formik';
 import styled from 'styled-components';
 import Box from '@material-ui/core/Box';
+import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import Snackbar from '@material-ui/core/Snackbar';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import {
   takeScreenShot,
   useMouse,
   boxDimensions,
+  dataUrlToBlob,
 } from './utils';
 
 const Container = styled.div`
@@ -71,23 +76,26 @@ const Crosshairs = styled.div`
 `;
 
 const Preview = styled.div`
+  flex-grow: 1;
   width: 100%;
-  height: 100%;
+  height: 300px;
   max-width: 600px;
   background-image: url('${({ src }) => src}');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  background-color: gainsboro;
+  border-radius: 4px;
 `;
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 
-const Selection = () => {
+const Selection = ({ onClose, onSave }) => {
   const [selectionCorner, setSelectionCorner] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
-  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [show, setShow] = useState(false);
   const { x, y } = useMouse();
 
@@ -100,6 +108,31 @@ const Selection = () => {
 
   const borderWidth = `${top}px ${rightBorder}px ${bottomBorder}px ${left}px`;
 
+  const handleClose = () => {
+    setShow(false);
+  };
+
+  const handleSave = async (values) => {
+    const file = await dataUrlToBlob(imagePreview);
+    const data = new FormData();
+    data.append('image', file);
+
+    // first store the image
+    const response = await Axios.post('http://localhost:3001/images', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    // Then send the feedback
+    await Axios.post('http://localhost:3001/feedback', {
+      user: values.user,
+      url: window.location.href,
+      comment: values.comment,
+      image: response.data,
+    });
+
+    onSave();
+  };
+
   const handleMouseDown = (event) => {
     setSelectionCorner({ x: event.clientX, y: event.clientY });
     setDragging(true);
@@ -110,7 +143,7 @@ const Selection = () => {
     const screenShot = await takeScreenShot(box);
     setDragging(false);
     setShow(true);
-    setImage(screenShot);
+    setImagePreview(screenShot);
   };
 
   useEffect(() => {
@@ -139,21 +172,66 @@ const Selection = () => {
 
   return (
     <>
-      <Dialog
-        open={show}
-        onClose={() => setShow(false)}
-        TransitionComponent={Transition}
-        keepMounted
+      <Formik
+        onSubmit={handleSave}
+        initialValues={{
+          user: '@michael',
+          imagePreview,
+          comment: '',
+        }}
       >
-        <DialogTitle>
-          Leave Feedback
-        </DialogTitle>
-        <DialogContent>
-          <Box width="500px" height="300px">
-            <Preview src={image} />
-          </Box>
-        </DialogContent>
-      </Dialog>
+        {({
+          values, handleChange, submitForm, isSubmitting,
+        }) => (
+          <Dialog
+            open={show}
+            onClose={handleClose}
+            TransitionComponent={Transition}
+            keepMounted
+          >
+            <DialogTitle>
+              Leave Feedback
+            </DialogTitle>
+            <DialogContent>
+              <Box width="500px">
+                <Preview src={imagePreview} />
+                <Box mt={2}>
+                  <>
+                    <TextField
+                      autoFocus
+                      id="comment"
+                      name="comment"
+                      label="Comments"
+                      margin="dense"
+                      variant="outlined"
+                      placeholder="Explain the issue..."
+                      multiline
+                      rows="4"
+                      fullWidth
+                      value={values.comment}
+                      onChange={handleChange}
+                    />
+                  </>
+                </Box>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              {isSubmitting
+                ? <CircularProgress size={24} />
+                : (
+                  <>
+                    <Button onClick={handleClose} color="primary">
+                      Cancel
+                    </Button>
+                    <Button onClick={submitForm} color="primary">
+                      Create
+                    </Button>
+                  </>
+                )}
+            </DialogActions>
+          </Dialog>
+        )}
+      </Formik>
       {!show && (
         dragging
           ? <SelectionOverlay style={{ borderWidth }} />
@@ -169,11 +247,24 @@ const Selection = () => {
 
 const App = () => {
   const [active, setActive] = useState(false);
+  const [snack, setSnack] = useState(null);
+  const closeSnack = () => {
+    setSnack(null);
+  };
+
+  const onSave = () => {
+    setSnack('Feedback Sent!');
+    setActive(false);
+    setTimeout(() => {
+      setSnack(null);
+    }, 2000);
+  };
+
 
   return (
     <Container>
-      {active && <Selection />}
-      <Box position="fixed" left="20px" bottom="20px">
+      {active && <Selection onSave={onSave} onClose={() => setActive(false)} />}
+      <Box position="fixed" left="24px" bottom="24px">
         <Button
           variant="contained"
           color="primary"
@@ -182,6 +273,12 @@ const App = () => {
           {active ? 'Cancel' : 'Leave Feedback'}
         </Button>
       </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={Boolean(snack)}
+        onClose={closeSnack}
+        message={<span>{snack}</span>}
+      />
     </Container>
   );
 };

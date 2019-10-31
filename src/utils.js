@@ -70,3 +70,19 @@ export const boxDimensions = (corner1, corner2) => {
     bottomBorder,
   };
 };
+
+export const dataUrlToBlob = async (url) => {
+  const res = await fetch(url);
+  const blob = await res.blob();
+  return blob;
+};
+
+export const makeBlob = (dataURI) => {
+  const byteString = atob(dataURI.split(',')[1]);
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: 'png' });
+};
