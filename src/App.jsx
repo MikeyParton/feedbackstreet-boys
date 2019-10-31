@@ -1,54 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import html2canvas from 'html2canvas';
-
-const takeScreenShot = async ({
-  top,
-  left,
-  width,
-  height,
-}) => {
-  const canvas = await html2canvas(document.querySelector('body'));
-  const croppedCanvas = document.createElement('canvas');
-  croppedCanvas.width = width * 2;
-  croppedCanvas.height = height * 2;
-  const croppedCanvasContext = croppedCanvas.getContext('2d');
-
-  croppedCanvasContext.drawImage(
-    canvas,
-    left * 2,
-    top * 2,
-    croppedCanvas.width,
-    croppedCanvas.height,
-    0,
-    0,
-    croppedCanvas.width,
-    croppedCanvas.height,
-  );
-  return croppedCanvas.toDataURL();
-};
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
+import {
+  takeScreenShot,
+  useMouse,
+  boxDimensions,
+} from './utils';
 
 const Container = styled.div`
-  position: fixed;
-  z-index: 999999999999;
-  left: 20px;
-  bottom: 20px;
-
   *, *:before, *:after {
     box-sizing: border-box;
   }
-`;
-
-const Button = styled.button`
-  padding: 8px 16px;
-  background-color: blue;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  bottom: 20px;
-  left: 20px;
-  position: fixed;
-  z-index: 99999999999999;
 `;
 
 const SelectionOverlay = styled.div`
@@ -101,18 +70,6 @@ const Crosshairs = styled.div`
   }
 `;
 
-const Modal = styled.div`
-  top: 0;
-  left: 0;
-  position: fixed;
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999999999999;
-`;
-
 const Preview = styled.div`
   width: 100%;
   height: 100%;
@@ -123,49 +80,9 @@ const Preview = styled.div`
   background-position: center;
 `;
 
-const useMouse = () => {
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (event) => {
-    setMouse({ x: event.clientX, y: event.clientY });
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
-
-  return mouse;
-};
-
-const boxDimensions = (corner1, corner2) => {
-  const { clientWidth, clientHeight } = document.documentElement;
-
-  const left = Math.min(corner1.x, corner2.x);
-  const right = Math.max(corner1.x, corner2.x);
-
-  const top = Math.min(corner1.y, corner2.y);
-  const bottom = Math.max(corner1.y, corner2.y);
-
-  const width = right - left;
-  const height = bottom - top;
-
-  const rightBorder = clientWidth - left - width;
-  const bottomBorder = clientHeight - top - height;
-
-  return {
-    left,
-    top,
-    right,
-    bottom,
-    width,
-    height,
-    rightBorder,
-    bottomBorder,
-  };
-};
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
 
 const Selection = () => {
   const [selectionCorner, setSelectionCorner] = useState({ x: 0, y: 0 });
@@ -220,26 +137,32 @@ const Selection = () => {
     };
   }, [show]);
 
-  if (show) {
-    return (
-      <>
-        <Overlay />
-        <Modal onClick={() => setShow(false)}>
-          <Preview src={image} />
-        </Modal>
-      </>
-    );
-  }
-
   return (
     <>
-      {dragging
-        ? <SelectionOverlay style={{ borderWidth }} />
-        : (
-          <Overlay>
-            <Crosshairs style={{ left: x, top: y }} />
-          </Overlay>
-        )}
+      <Dialog
+        open={show}
+        onClose={() => setShow(false)}
+        TransitionComponent={Transition}
+        keepMounted
+      >
+        <DialogTitle>
+          Leave Feedback
+        </DialogTitle>
+        <DialogContent>
+          <Box width="500px" height="300px">
+            <Preview src={image} />
+          </Box>
+        </DialogContent>
+      </Dialog>
+      {!show && (
+        dragging
+          ? <SelectionOverlay style={{ borderWidth }} />
+          : (
+            <Overlay>
+              <Crosshairs style={{ left: x, top: y }} />
+            </Overlay>
+          )
+      )}
     </>
   );
 };
@@ -250,9 +173,15 @@ const App = () => {
   return (
     <Container>
       {active && <Selection />}
-      <Button onClick={() => setActive((prev) => !prev)}>
-        {active ? 'Turn Off' : 'Turn On'}
-      </Button>
+      <Box position="fixed" left="20px" bottom="20px">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setActive((prev) => !prev)}
+        >
+          {active ? 'Cancel' : 'Leave Feedback'}
+        </Button>
+      </Box>
     </Container>
   );
 };
