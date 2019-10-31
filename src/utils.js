@@ -7,7 +7,7 @@ export const takeScreenShot = async ({
   width,
   height,
 }) => {
-  const canvas = await html2canvas(document.querySelector('body'));
+  const canvas = await html2canvas(document.querySelector('body'), { allowTaint: true });
   const croppedCanvas = document.createElement('canvas');
   croppedCanvas.width = width * 2;
   croppedCanvas.height = height * 2;

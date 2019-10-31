@@ -19,6 +19,8 @@ import {
   dataUrlToBlob,
 } from './utils';
 
+const Z_INDEX = 1300;
+
 const Container = styled.div`
   *, *:before, *:after {
     box-sizing: border-box;
@@ -34,6 +36,7 @@ const SelectionOverlay = styled.div`
   border-style: solid;
   background-color: inherit;
   border-color: rgba(0, 0, 0, 0.5);
+  z-index: ${Z_INDEX};
 `;
 
 const Overlay = styled.div`
@@ -43,13 +46,13 @@ const Overlay = styled.div`
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: ${Z_INDEX};
 `;
 
 const Crosshairs = styled.div`
   height: 100%;
   position: absolute;
   width: 100%;
-  z-index: 999999999999;
 
   &::before, &::after {
     content: "";
@@ -145,6 +148,25 @@ const Selection = ({ onClose, onSave }) => {
     setShow(true);
     setImagePreview(screenShot);
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key !== 'Escape' || show) return;
+
+    if (dragging) {
+      setDragging(false);
+      return;
+    }
+
+    onClose();
+  };
+
+  useEffect(() => {
+    document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [dragging, show]);
 
   useEffect(() => {
     if (dragging) {
@@ -264,7 +286,7 @@ const App = () => {
   return (
     <Container>
       {active && <Selection onSave={onSave} onClose={() => setActive(false)} />}
-      <Box position="fixed" left="24px" bottom="24px">
+      <Box position="fixed" left="24px" bottom="24px" zIndex={Z_INDEX}>
         <Button
           variant="contained"
           color="primary"
