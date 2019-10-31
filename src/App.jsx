@@ -12,6 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import Snackbar from '@material-ui/core/Snackbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { Typography } from '@material-ui/core';
 import {
   takeScreenShot,
   useMouse,
@@ -89,6 +90,17 @@ const Preview = styled.div`
   background-position: center;
   background-color: gainsboro;
   border-radius: 4px;
+`;
+
+const Instructions = styled(Typography)`
+  && {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+  }
 `;
 
 const Transition = React.forwardRef((props, ref) => (
@@ -244,10 +256,18 @@ const Selection = ({ onClose, onSave }) => {
                 ? <CircularProgress size={24} />
                 : (
                   <>
-                    <Button onClick={handleClose} color="primary">
+                    <Button
+                      onClick={handleClose}
+                      variant="contained"
+                      color="secondary"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={submitForm} color="primary">
+                    <Button
+                      onClick={submitForm}
+                      variant="contained"
+                      color="primary"
+                    >
                       Create
                     </Button>
                   </>
@@ -261,6 +281,9 @@ const Selection = ({ onClose, onSave }) => {
           ? <SelectionOverlay style={{ borderWidth }} />
           : (
             <Overlay>
+              <Instructions fullWidth color="white">
+                Drag a box over a section of the screen to take a screenshot of the issue
+              </Instructions>
               <Crosshairs style={{ left: x, top: y }} />
             </Overlay>
           )
