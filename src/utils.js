@@ -7,6 +7,7 @@ export const takeScreenShot = async ({
   width,
   height,
 }) => {
+  const { scrollTop, scrollLeft } = document.documentElement;
   const canvas = await html2canvas(document.querySelector('body'), { allowTaint: true });
   const croppedCanvas = document.createElement('canvas');
   croppedCanvas.width = width * 2;
@@ -15,8 +16,8 @@ export const takeScreenShot = async ({
 
   croppedCanvasContext.drawImage(
     canvas,
-    left * 2,
-    top * 2,
+    (left + scrollLeft) * 2,
+    (top + scrollTop) * 2,
     croppedCanvas.width,
     croppedCanvas.height,
     0,
@@ -28,7 +29,10 @@ export const takeScreenShot = async ({
 };
 
 export const useMouse = () => {
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const [mouse, setMouse] = useState({
+    x: 0,
+    y: 0,
+  });
 
   const handleMouseMove = (event) => {
     setMouse({ x: event.clientX, y: event.clientY });

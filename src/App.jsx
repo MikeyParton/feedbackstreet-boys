@@ -137,8 +137,10 @@ const Selection = ({ onClose, onSave }) => {
   };
 
   const handleMouseDown = (event) => {
-    setSelectionCorner({ x: event.clientX, y: event.clientY });
-    setDragging(true);
+    if (event.button === 0) {
+      setSelectionCorner({ x: event.clientX, y: event.clientY });
+      setDragging(true);
+    }
   };
 
   const handleMouseUp = async (event) => {
