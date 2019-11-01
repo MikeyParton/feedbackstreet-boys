@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Axios from 'axios';
 import { Formik } from 'formik';
 import styled from 'styled-components';
+import qs from 'query-string';
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -19,6 +20,7 @@ import {
   boxDimensions,
   dataUrlToBlob,
   wait,
+  scrollTo,
 } from './utils';
 
 const Z_INDEX = 1300;
@@ -132,6 +134,8 @@ const Selection = ({ onClose, onSave }) => {
   const handleSave = async (values) => {
     const file = await dataUrlToBlob(imagePreview);
     const data = new FormData();
+    const box = boxDimensions(selectionCorner, otherSelectionCorner);
+
     data.append('image', file);
 
     // first store the image
@@ -139,10 +143,21 @@ const Selection = ({ onClose, onSave }) => {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 
+    // Add scroll param to url
+    const { search, origin, pathname } = window.location;
+    const params = qs.parse(search);
+    const { scrollTop } = document.documentElement;
+
+    if (scrollTop > 0) {
+      params.feedbackstreet_boys_scroll = scrollTop + box.top;
+    }
+
+    const url = `${origin}${pathname}?${qs.stringify(params)}`;
+
     // Then send the feedback
     await Axios.post('http://localhost:3001/feedback', {
       user: values.user,
-      url: window.location.href,
+      url,
       comment: values.comment,
       image: response.data,
     });
@@ -161,9 +176,9 @@ const Selection = ({ onClose, onSave }) => {
   const handleMouseUp = async (event) => {
     const otherCorner = ({ x: event.clientX, y: event.clientY });
     setOtherSelectionCorner(otherCorner);
+    const box = boxDimensions(selectionCorner, otherCorner);
     // Little helper to test longer loading times
     // await wait(3000);
-    const box = boxDimensions(selectionCorner, otherCorner);
     const screenShot = await takeScreenShot(box);
     setDragging(false);
     setShow(true);
@@ -316,6 +331,13 @@ const App = () => {
   const closeSnack = () => {
     setSnack(null);
   };
+
+  useEffect(() => {
+    const { feedbackstreet_boys_scroll } = qs.parse(window.location.search);
+    if (feedbackstreet_boys_scroll) {
+      scrollTo(feedbackstreet_boys_scroll);
+    }
+  }, []);
 
   const onSave = () => {
     setSnack('Feedback Sent!');

@@ -17,6 +17,7 @@
     "axios": "^0.19.0",
     "formik": "^2.0.3",
     "html2canvas": "^1.0.0-rc.5",
+    "query-string": "5",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "styled-components": "^4.4.0"

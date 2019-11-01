@@ -8,7 +8,10 @@ export const takeScreenShot = async ({
   height,
 }) => {
   const { scrollTop, scrollLeft } = document.documentElement;
-  const canvas = await html2canvas(document.querySelector('body'), { allowTaint: true });
+  const canvas = await html2canvas(document.querySelector('body'), {
+    useCORS: true,
+    allowTaint: true,
+  });
   const croppedCanvas = document.createElement('canvas');
   croppedCanvas.width = width * 2;
   croppedCanvas.height = height * 2;
@@ -96,3 +99,7 @@ export const wait = (time = 0) => new Promise((resolve) => {
     resolve();
   }, time);
 });
+
+export const scrollTo = (top) => {
+  window.scrollTo({ top, behavior: 'smooth' });
+};
