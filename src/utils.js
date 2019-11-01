@@ -90,3 +90,9 @@ export const makeBlob = (dataURI) => {
   }
   return new Blob([ab], { type: 'png' });
 };
+
+export const wait = (time = 0) => new Promise((resolve) => {
+  setTimeout(() => {
+    resolve();
+  }, time);
+});

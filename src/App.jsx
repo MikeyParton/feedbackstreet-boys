@@ -18,6 +18,7 @@ import {
   useMouse,
   boxDimensions,
   dataUrlToBlob,
+  wait,
 } from './utils';
 
 const Z_INDEX = 1300;
@@ -94,7 +95,7 @@ const Preview = styled.div`
 
 const Instructions = styled(Typography)`
   && {
-    position: absolute;
+    position: fixed;
     top: 24px;
     left: 0;
     right: 0;
@@ -109,6 +110,7 @@ const Transition = React.forwardRef((props, ref) => (
 
 const Selection = ({ onClose, onSave }) => {
   const [selectionCorner, setSelectionCorner] = useState({ x: 0, y: 0 });
+  const [otherSelectionCorner, setOtherSelectionCorner] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [show, setShow] = useState(false);
@@ -119,7 +121,7 @@ const Selection = ({ onClose, onSave }) => {
     top,
     rightBorder,
     bottomBorder,
-  } = boxDimensions({ x, y }, selectionCorner);
+  } = boxDimensions(otherSelectionCorner || { x, y }, selectionCorner);
 
   const borderWidth = `${top}px ${rightBorder}px ${bottomBorder}px ${left}px`;
 
@@ -150,13 +152,18 @@ const Selection = ({ onClose, onSave }) => {
 
   const handleMouseDown = (event) => {
     if (event.button === 0) {
+      setOtherSelectionCorner(null);
       setSelectionCorner({ x: event.clientX, y: event.clientY });
       setDragging(true);
     }
   };
 
   const handleMouseUp = async (event) => {
-    const box = boxDimensions(selectionCorner, { x: event.clientX, y: event.clientY });
+    const otherCorner = ({ x: event.clientX, y: event.clientY });
+    setOtherSelectionCorner(otherCorner);
+    // Little helper to test longer loading times
+    // await wait(3000);
+    const box = boxDimensions(selectionCorner, otherCorner);
     const screenShot = await takeScreenShot(box);
     setDragging(false);
     setShow(true);
@@ -278,7 +285,18 @@ const Selection = ({ onClose, onSave }) => {
       </Formik>
       {!show && (
         dragging
-          ? <SelectionOverlay style={{ borderWidth }} />
+          ? (
+            <SelectionOverlay
+              style={{ borderWidth }}
+            >
+              {otherSelectionCorner && (
+              <Instructions fullWidth color="white">
+                Taking screenshot ... &nbsp;
+                <CircularProgress size={18} color="white" />
+              </Instructions>
+              )}
+            </SelectionOverlay>
+          )
           : (
             <Overlay>
               <Instructions fullWidth color="white">
