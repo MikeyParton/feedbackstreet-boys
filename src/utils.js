@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import html2canvas from 'html2canvas';
+
+export const Z_INDEX = 1300;
 
 export const takeScreenShot = async ({
   top,
@@ -8,27 +9,7 @@ export const takeScreenShot = async ({
   height,
 }) => {
   const { scrollTop, scrollLeft } = document.documentElement;
-  const canvas = await html2canvas(document.querySelector('body'), {
-    useCORS: true,
-    allowTaint: true,
-  });
-  const croppedCanvas = document.createElement('canvas');
-  croppedCanvas.width = width * 2;
-  croppedCanvas.height = height * 2;
-  const croppedCanvasContext = croppedCanvas.getContext('2d');
-
-  croppedCanvasContext.drawImage(
-    canvas,
-    (left + scrollLeft) * 2,
-    (top + scrollTop) * 2,
-    croppedCanvas.width,
-    croppedCanvas.height,
-    0,
-    0,
-    croppedCanvas.width,
-    croppedCanvas.height,
-  );
-  return croppedCanvas.toDataURL();
+  chrome.runtime.sendMessage({ message: 'takeScreenshot' });
 };
 
 export const useMouse = () => {
