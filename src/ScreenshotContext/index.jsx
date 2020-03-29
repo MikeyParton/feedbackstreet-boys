@@ -37,16 +37,14 @@ const ScreenshotProvider = ({
   }, [dimensions]);
 
   const requestScreenshot = (dimensionsInput) => {
-    const { scrollTop, scrollLeft } = document.documentElement;
-
+    // Accounts for retina displays & device zoom
+    const scale = window.devicePixelRatio;
     setCurrentImage(null);
-
-    // TODO: Remove hardcoded multiply by 2 and find way to account for retina display.
     setDimensions({
-      height: dimensionsInput.height * 2,
-      width: dimensionsInput.width * 2,
-      left: (dimensionsInput.left + scrollLeft) * 2,
-      top: (dimensionsInput.top + scrollTop) * 2,
+      height: dimensionsInput.height * scale,
+      width: dimensionsInput.width * scale,
+      left: dimensionsInput.left * scale,
+      top: dimensionsInput.top * scale,
     });
 
     chrome.runtime.sendMessage({ type: SCREENSHOT_REQUESTED });
