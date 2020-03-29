@@ -20,6 +20,7 @@
     "query-string": "5",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "react-frame-component": "^4.1.1",
     "styled-components": "^4.4.0"
   },
   "staticFiles": {

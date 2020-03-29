@@ -46,8 +46,8 @@ export const Crosshairs = styled.div`
   }
 
   &::after {
-    left: 0px;
-    top: 0px;
+    left: -1px;
+    top: -1px;
     border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
     border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
   }

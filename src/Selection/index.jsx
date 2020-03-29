@@ -22,7 +22,9 @@ const Selection = ({ onClose, onSave }) => {
   const [otherSelectionCorner, setOtherSelectionCorner] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [show, setShow] = useState(false);
-  const { x, y } = useMouse();
+  // TODO: don't hardcode anything, use context to expose ref instead.
+  const iframeDocument = document.querySelector('iframe').contentWindow.document;
+  const { x, y } = useMouse(iframeDocument);
   const { requestScreenshot, currentImage } = useScreenshot();
 
   const {
@@ -103,34 +105,34 @@ const Selection = ({ onClose, onSave }) => {
   };
 
   useEffect(() => {
-    document.removeEventListener('keydown', handleKeyDown);
-    document.addEventListener('keydown', handleKeyDown);
+    iframeDocument.removeEventListener('keydown', handleKeyDown);
+    iframeDocument.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      iframeDocument.removeEventListener('keydown', handleKeyDown);
     };
   }, [dragging, show]);
 
   useEffect(() => {
     if (dragging) {
-      document.addEventListener('mouseup', handleMouseUp);
+      iframeDocument.addEventListener('mouseup', handleMouseUp);
     } else {
-      document.removeEventListener('mouseup', handleMouseUp);
+      iframeDocument.removeEventListener('mouseup', handleMouseUp);
     }
 
     return () => {
-      document.removeEventListener('mouseup', handleMouseUp);
+      iframeDocument.removeEventListener('mouseup', handleMouseUp);
     };
   }, [dragging]);
 
   useEffect(() => {
     if (!show) {
-      document.addEventListener('mousedown', handleMouseDown);
+      iframeDocument.addEventListener('mousedown', handleMouseDown);
     } else {
-      document.removeEventListener('mousedown', handleMouseDown);
+      iframeDocument.removeEventListener('mousedown', handleMouseDown);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
+      iframeDocument.removeEventListener('mousedown', handleMouseDown);
     };
   }, [show]);
 

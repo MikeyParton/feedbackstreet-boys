@@ -2,17 +2,7 @@ import { useState, useEffect } from 'react';
 
 export const Z_INDEX = 1300;
 
-export const takeScreenShot = async ({
-  top,
-  left,
-  width,
-  height,
-}) => {
-  const { scrollTop, scrollLeft } = document.documentElement;
-  chrome.runtime.sendMessage({ message: 'takeScreenshot' });
-};
-
-export const useMouse = () => {
+export const useMouse = (node) => {
   const [mouse, setMouse] = useState({
     x: 0,
     y: 0,
@@ -23,9 +13,10 @@ export const useMouse = () => {
   };
 
   useEffect(() => {
-    document.addEventListener('mousemove', handleMouseMove);
+    const container = node || document;
+    container.addEventListener('mousemove', handleMouseMove);
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
