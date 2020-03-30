@@ -11,9 +11,15 @@
   "browser_action": {
     "default_popup": "index.html"
   },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
   "content_scripts": [
     {
       "matches": [
+        "<all_urls>",
         "http://*/*",
         "https://*/*"
       ],
@@ -26,6 +32,7 @@
     "widget.html"
   ],
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "<all_urls>"
   ]
 }

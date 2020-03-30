@@ -6,7 +6,7 @@
   "scripts": {
     "start": "parcel src/test.html",
     "prebuild": "rimraf dist",
-    "build": "yarn prebuild && parcel build src/index.jsx src/content.jsx src/widget.html",
+    "build": "yarn prebuild && parcel build src/index.jsx src/content.jsx src/widget.html src/background.js",
     "lint": "eslint src/ --ext .js --ext .jsx"
   },
   "keywords": [],

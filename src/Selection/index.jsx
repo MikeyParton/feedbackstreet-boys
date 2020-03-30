@@ -149,7 +149,7 @@ const Selection = ({ onClose, onSave }) => {
             >
               {otherSelectionCorner && (
                 <Instructions fullWidth color="white">
-                  Taking screenshot ... &nbsp;
+                  {'Taking screenshot ... '}
                   <CircularProgress size={18} color="white" />
                 </Instructions>
               )}
