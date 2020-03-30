@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 export const Z_INDEX = 1300;
 
-export const useMouse = (node) => {
+export const useMouse = () => {
   const [mouse, setMouse] = useState({
     x: 0,
     y: 0,
@@ -13,10 +13,9 @@ export const useMouse = (node) => {
   };
 
   useEffect(() => {
-    const container = node || document;
-    container.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousemove', handleMouseMove);
     return () => {
-      container.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 

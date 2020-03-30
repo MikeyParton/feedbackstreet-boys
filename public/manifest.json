@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Feed-BackStreet Boys",
-  "description": "Beleive when I say, I want it that way",
+  "description": "Believe when I say, I want it that way",
   "version": "1.0",
   "icons": {
     "16": "nick-carter.png",
@@ -21,6 +21,9 @@
         "content.js"
       ]
     }
+  ],
+  "web_accessible_resources": [
+    "widget.html"
   ],
   "permissions": [
     "activeTab"

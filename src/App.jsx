@@ -1,21 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import qs from 'query-string';
-import Frame, { FrameContextConsumer } from 'react-frame-component';
-import styled, { StyleSheetManager } from 'styled-components';
+import styled from 'styled-components';
 import Snackbar from '@material-ui/core/Snackbar';
 import Selection from './Selection';
 import { scrollTo } from './utils';
 import ScreenshotProvider from './ScreenshotContext';
-
-const frameStyles = {
-  height: '100vh',
-  width: '100vw',
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  border: 'none',
-  zIndex: 10000000000000000000,
-};
 
 const Container = styled.div`
   *, *:before, *:after {
@@ -55,29 +44,20 @@ const App = () => {
 
   return (
     <ScreenshotProvider>
-      <Frame style={frameStyles}>
-        <FrameContextConsumer>
-          {(frameContext) => (
-            <StyleSheetManager target={frameContext.document.head}>
-
-              <Container>
-                {active && <Selection onSave={onSave} onClose={() => setActive(false)} />}
-                <ButtonContainer>
-                  <button type="button" onClick={() => setActive((prev) => !prev)}>
-                    {active ? 'Cancel' : 'Leave Feedbacks'}
-                  </button>
-                </ButtonContainer>
-                <Snackbar
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                  open={Boolean(snack)}
-                  onClose={closeSnack}
-                  message={<span>{snack}</span>}
-                />
-              </Container>
-            </StyleSheetManager>
-          )}
-        </FrameContextConsumer>
-      </Frame>
+      <Container>
+        {active && <Selection onSave={onSave} onClose={() => setActive(false)} />}
+        <ButtonContainer>
+          <button type="button" onClick={() => setActive((prev) => !prev)}>
+            {active ? 'Cancel' : 'Leave Feedbacks'}
+          </button>
+        </ButtonContainer>
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          open={Boolean(snack)}
+          onClose={closeSnack}
+          message={<span>{snack}</span>}
+        />
+      </Container>
     </ScreenshotProvider>
   );
 };
