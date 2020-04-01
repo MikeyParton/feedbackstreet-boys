@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Typography from '@material-ui/core/Typography';
-import { Z_INDEX } from '../constants';
+
+const Z_INDEX = 5000;
 
 export const SelectionOverlay = styled.div`
   position: fixed;

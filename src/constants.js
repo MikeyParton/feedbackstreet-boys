@@ -1,4 +1,5 @@
-export const Z_INDEX = 5000;
+export const WIDGET_SHOW = 'WIDGET_SHOW';
+export const WIDGET_HIDE = 'WIDGET_HIDE';
 
 export const SCREENSHOT_REQUESTED = 'SCREENSHOT_REQUESTED';
 export const SCREENSHOT_READY = 'SCREENSHOT_READY';

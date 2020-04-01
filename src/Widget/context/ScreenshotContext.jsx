@@ -1,7 +1,7 @@
 import React, {
   useState, useContext, useEffect, createContext, useCallback,
 } from 'react';
-import { SCREENSHOT_READY, SCREENSHOT_REQUESTED } from '../constants';
+import { SCREENSHOT_READY, SCREENSHOT_REQUESTED } from '../../constants';
 
 const ScreenshotContext = createContext();
 

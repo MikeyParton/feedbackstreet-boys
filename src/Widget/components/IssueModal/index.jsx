@@ -10,7 +10,7 @@ import Slide from '@material-ui/core/Slide';
 import Box from '@material-ui/core/Box';
 import Button from '@material-ui/core/Button';
 import { Preview } from './styled';
-import { useScreenshot } from '../ScreenshotContext';
+import { useScreenshot } from '../../context/ScreenshotContext';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

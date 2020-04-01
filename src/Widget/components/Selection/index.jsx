@@ -14,8 +14,8 @@ import {
   boxDimensions,
   dataUrlToBlob,
   wait,
-} from '../utils';
-import { useScreenshot } from '../ScreenshotContext';
+} from '../../../utils';
+import { useScreenshot } from '../../context/ScreenshotContext';
 
 const Selection = ({ onClose, onSave }) => {
   const [selectionCorner, setSelectionCorner] = useState({ x: 0, y: 0 });
@@ -122,17 +122,17 @@ const Selection = ({ onClose, onSave }) => {
     };
   }, [dragging]);
 
-  useEffect(() => {
-    if (!show) {
-      document.addEventListener('mousedown', handleMouseDown);
-    } else {
-      document.removeEventListener('mousedown', handleMouseDown);
-    }
+  // useEffect(() => {
+  //   if (!show) {
+  //     document.addEventListener('mousedown', handleMouseDown);
+  //   } else {
+  //     document.removeEventListener('mousedown', handleMouseDown);
+  //   }
 
-    return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, [show]);
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleMouseDown);
+  //   };
+  // }, [show]);
 
   return (
     <>
@@ -156,7 +156,7 @@ const Selection = ({ onClose, onSave }) => {
             </SelectionOverlay>
           )
           : (
-            <Overlay>
+            <Overlay onMouseDown={handleMouseDown}>
               <Instructions fullWidth color="white">
                 Drag a box over a section of the screen to take a screenshot of the issue
               </Instructions>
